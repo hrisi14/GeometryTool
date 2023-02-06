@@ -94,8 +94,8 @@ void parallelLine(double a, double b, double c, double xP, double yP, double& a1
         double k = -a / b;      //gets the slope coefficient of the given line
 
        //the parallel line has the equation:  a1*x + b1*y + c1 = 0
-        a1 = round(k);
-        c1 = round(-(yP - a1 * xP));
+        a1 = k;
+        c1 = yP - a1 * xP;
         b1 = 1;
     }
     else if (b == 0)
@@ -111,15 +111,15 @@ void perpendicularLine(double a, double b, double c, double xp, double yp, doubl
     {
         double k = -a / b;             //gets the slope coefficient of the given line
                                        //the parallel line has the equation:  a1x + b1y + c1 = 0:
-        a1 = round(-k);                //two lines (i.e. p1 and p2) are perpendicular <=> k1*k2 = -1
-        c1 = round(-(yp - a1 * xp));
-        b1 = 1;
+        a1 = -1/k;                //two lines (i.e. p1 and p2) are perpendicular <=> k1*k2 = -1
+        c1 = round(yp - a1 * xp);
+        b1 = -1;
     }
     else if (b == 0)
     {
         a1 = 0;
-        b1 = -1;
-        c = yp;
+        b1 = 1;
+        c1 = yp;
     }
 }
 void findIntersectionPointOfLines(double a, double b, double c, double a1, double b1, double c1, double& x, double& y, bool& matching, bool& parallel)
@@ -135,26 +135,26 @@ void findIntersectionPointOfLines(double a, double b, double c, double a1, doubl
   }
     else  if(b1!=0 && b!=0)                      //General case - finds the intersection point
     {
-        double k = round(-a / b);                       //Finds the coefficient of the two lines according to their decartian equations     
-        double k1 = round(-a1 / b1);
-        double n = round(-c / b);
-        double n1 = round(-c1 / b1);
-        x = round((n1 - n) / (k - k1));
-        y = round(k * x + n);
+        double k = -a / b;                       //Finds the coefficient of the two lines according to their decartian equations     
+        double k1 = -a1 / b1;
+        double n = -c / b;
+        double n1 = -c1 / b1;
+        x = (n1 - n) / (k - k1);
+        y = k * x + n;
     }
     else if (b == 0 && b1 != 0)
     {
-        double k1 = round(-a1 / b1);
-        double n1 = round(-c1 / b1);
-        x = round((n1 - c) / (a - k1));
-        y = round(k1 * x + n1);
+        double k1 = -a1 / b1;
+        double n1 = -c1 / b1;
+        x = (-c-b*n1) / (a+b*k1);
+        y = k1 * x + n1;
     }
     else if (b1 == 0 && b != 0)
     {
-        double k = round(-a / b);
-        double n = round(-c / b);
-        x = round((n - c1) / (a1 - k));
-        y = round(k * x + n);
+        double k = -a / b;
+        double n = -c / b;
+        x = (-c1-b1*n) / (a1 + b1*k);
+        y = k * x + n;
     }
 }
 void findEquationOfALineByTwoPoints(double x1, double y1, double x2, double y2, double& a, double& b, double& c)
@@ -256,35 +256,37 @@ void findBisectorsOfATriangle(double xA, double yA, double xB, double yB, double
 void findIntersectionPointsOfParabolaAndALine(double a, double b, double c, double aP, double bP, double cP, double& x1, double& y1, double& x2, double& y2, bool& intersect)
 {
     double k, n, D;
-    if (b == 0 && a!=0)
+    if (b == 0)
     {
-        x1 = x2 = -c / a;
-        y1 = y2 = aP * x1 * x1 + bP * x1 + cP;
-        intersect = true;
+        if (a != 0)
+        {
+            x1 = x2 = -c / a;
+            y1 = y2 = aP * x1 * x1 + bP * x1 + cP;
+            intersect = true;
+        }
     }
     else
     {
         k = -a / b;    //Here we use the decartian equation of a line (y = kx + n) to find the intersection points (with the parabola) easier
         n = -c / b;
-        D = (b - k) * (b - k) - 4 * a * (c - n);
+        D = (bP - k) * (bP - k) - 4 * aP * (cP - n);
         // Now we go through three different cases according to the values of the discriminant D:
         if (D > 0)
         {
-            x1 = (k - b + sqrt(D)) / (2 * a);
-            x2 = (k - b - sqrt(D)) / (2 * a);
+            x1 = (k - bP + sqrt(D)) / (2 * aP);
+            x2 = (k - bP - sqrt(D)) / (2 * aP);
             y1 = k * x1 + n;
             y2 = k * x2 + n;
             intersect = true;
         }
         else if (isEqualAbs(D, 0))
         {
-            x1 = x2 = (k - b) / (2 * a);
+            x1 = x2 = (k - bP) / (2 * a);
             y1 = y2 = k * x1 + n;
             intersect = true;
         }
-        else    //(when D>0) we have no intersection points
-        {
-            //char message[] = "The parabola and the line have no intersection points.";
+        else    //(when D>0) the parabola and the line have no intersection points
+        {   
             intersect = false;
         }
     }
@@ -305,9 +307,9 @@ void findTangentLinesOfAParabola(double a, double b, double c, double xM, double
         //where (xM; yM) are the coordinates of the given point
         //and f`(x) is the derivative of the function f = a*x^2 + b*x + c (which is the equation of the parabola).
         //Simplifying the above equation of the tangent line, we get the following coefficients:
-        aTangentL1 = aTangentL2 = round(2 * a*xM+b);
+        aTangentL1 = aTangentL2 = 2 * a*xM+b;
         bTangentL1 = bTangentL2 = -1;
-        cTangentL1 = bTangentL2 = round(c - a * xM * xM);  
+        cTangentL1 = bTangentL2 = c - a * xM * xM;  
         noTangentLines = false;
     }   
     else if (!isEqualAbs(f,yM))
@@ -319,12 +321,12 @@ void findTangentLinesOfAParabola(double a, double b, double c, double xM, double
          }
          else
          {
-             double Dk = round(4 * a * (a * xM * xM + b * xM + c - yM));
-             aTangentL1 = round((b + 2 * a * xM) + sqrt(Dk));
-             aTangentL2 = round((b + 2 * a * xM) - sqrt(Dk));
+             double Dk = 4 * a * (a * xM * xM + b * xM + c - yM);
+             aTangentL1 = b + 2 * a * xM + sqrt(Dk);
+             aTangentL2 = b + 2 * a * xM - sqrt(Dk);
              bTangentL1 = bTangentL2 = -1;
-             cTangentL1 = round(yM - aTangentL1 * xM);
-             cTangentL2 = round(yM - aTangentL2 * xM);
+             cTangentL1 = yM - aTangentL1 * xM;
+             cTangentL2 = yM - aTangentL2 * xM;
              noTangentLines = false;
          }
     }
@@ -527,7 +529,7 @@ void printOpeningMessage()
     std::cout << "1) Check whether a particular point lies on a given line." << std::endl;
     std::cout << "2) Find a line paralel to another through a given point." << std::endl;
     std::cout << "3) Find a line perpendicular to another in a particular point." << std::endl;
-    std::cout << "4) Find the intersection point of two lines:" << std::endl;
+    std::cout << "4) Find the intersection point of two lines." << std::endl;
     std::cout << "5) Find the equations of the heights, medians and bisectors of a triangle." << std::endl;
     std::cout << "6) Find the equation(s) of the tangent line(s) to a parabola through a given point." << std::endl;
     std::cout << "7) Find the intersection points of a line and a parabola." << std::endl;
@@ -547,7 +549,7 @@ void printLineEquation(double a, double b, double c)
         }
         else
         {
-            std::cout << " y = " << -c << std::endl;
+            std::cout << " y = " << c << std::endl;
         }
     }
     else if (a != 0 && b == 0)
