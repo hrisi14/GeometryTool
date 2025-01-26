@@ -1,4 +1,4 @@
-# hrisi
+
                       Geometry tool
 An ultimate guide to a universe of geometric magic
 									
