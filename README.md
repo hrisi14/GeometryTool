@@ -1,7 +1,7 @@
 # hrisi
                       Geometry tool
 An ultimate guide to a universe of geometric magic
-									By Hristina Frangova
+									
 
 1.	Introduction.
 Geometry tool is a written in C++ project that executes the following operation:
